@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selenium ➡️ Playwright Converter</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --border-color: #30363d;
+            --success-color: #2ea043;
+            --error-color: #da3633;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+        }
+
+        p {
+            margin: 5px 0 0;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            min-height: 0; /* Important for flex child scrolling */
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 10px 15px;
+            background-color: #21262d;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            background-color: transparent;
+            color: var(--text-color);
+            border: none;
+            padding: 15px;
+            resize: none;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+            gap: 15px;
+        }
+
+        button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2c974b;
+        }
+
+        button:disabled {
+            background-color: #238636;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        select {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .status-bar {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none; /* Hidden by default */
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🚀 Selenium to Playwright Converter</h1>
+    <p>Powered by Local LLM (Ollama)</p>
+</header>
+
+<div class="controls">
+    <label>Target Language:
+        <select id="language">
+            <option value="typescript">TypeScript</option>
+            <option value="javascript">JavaScript</option>
+        </select>
+    </label>
+    <button id="convertBtn" onclick="convertCode()">⚡ Convert</button>
+</div>
+
+<div class="container">
+    <div class="panel">
+        <div class="panel-header">Source: Java (Selenium)</div>
+        <textarea id="source" placeholder="Paste your Selenium Java code here..."></textarea>
+    </div>
+    
+    <div class="panel">
+        <div class="panel-header">Output: Playwright (TS/JS)</div>
+        <textarea id="output" placeholder="Converted code will appear here..." readonly></textarea>
+    </div>
+</div>
+
+<div id="status" class="status-bar"></div>
+
+<script>
+    async function convertCode() {
+        const source = document.getElementById('source').value;
+        const language = document.getElementById('language').value;
+        const convertBtn = document.getElementById('convertBtn');
+        const outputBtn = document.getElementById('output');
+        const statusDiv = document.getElementById('status');
+
+        if (!source.trim()) {
+            alert("Please paste some Java code first.");
+            return;
+        }
+
+        // UI Updates
+        convertBtn.disabled = true;
+        convertBtn.innerHTML = '<span class="loading"></span>Converting...';
+        outputBtn.value = "";
+        statusDiv.style.display = 'block';
+        statusDiv.innerText = "Waiting for Local LLM logic...";
+        statusDiv.style.borderColor = "var(--accent-color)";
+
+        try {
+            const response = await fetch('/api/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ source_code: source, language: language })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                outputBtn.value = data.converted_code;
+                statusDiv.innerText = "✅ Conversion Complete!";
+                statusDiv.style.color = "var(--success-color)";
+                statusDiv.style.borderColor = "var(--success-color)";
+            } else {
+                statusDiv.innerText = "❌ Error: " + data.error;
+                statusDiv.style.color = "var(--error-color)";
+                statusDiv.style.borderColor = "var(--error-color)";
+            }
+        } catch (error) {
+            statusDiv.innerText = "❌ Network Error: " + error.message;
+            statusDiv.style.color = "var(--error-color)";
+        } finally {
+            convertBtn.disabled = false;
+            convertBtn.innerHTML = '⚡ Convert';
+        }
+    }
+</script>
+
+</body>
+</html>
