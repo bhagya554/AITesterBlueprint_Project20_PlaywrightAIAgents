@@ -1,0 +1,308 @@
+{
+  "name": "TestCase Generator_Google Docs PRD_OutputInGoogleSheets",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -880,
+        -256
+      ],
+      "id": "4d9f5253-dd19-432d-8a24-70ad1c19c184",
+      "name": "When chat message received",
+      "webhookId": "a44b45c1-74d2-4870-8199-e951e96e1438"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Senior QA Engineer with 15+ years of experience in manual and functional testing, test design, and quality assurance best practices.\n________________________________________\n🎯 Objective\nYour task is to generate high-quality, comprehensive test cases based on inputs received via chat trigger in the n8n workflow.\n________________________________________\n📥 Inputs\nYou will receive a user prompt such as:\n\"Create test cases for app.vwo.com\"\nAlong with this, you will have access to:\n1.\tPRD Documentation (Google Docs) – Contains detailed product requirements : \"PRD Google Document\" tool\n2.\tJIRA Ticket – \"Read JIRA\" tool Includes:\no\tTitle\no\tDescription\no\tAcceptance Criteria (if available)\n\nTool Name:\n-to get the PRD: \"PRD Google Document\" tool\n-to get the JIRA: \"Read JIRA\" tool\n________________________________________\n🧠 Instructions\n1.\tUnderstand Context\no\tThoroughly analyze the PRD document.\no\tRead and interpret the full JIRA ticket (title + description + acceptance criteria).\no\tIdentify the feature, workflows, edge cases, and business rules.\n2.\tTest Design Approach\no\tApply industry-standard techniques:\n\tBoundary Value Analysis\n\tEquivalence Partitioning\n\tPositive & Negative Testing\n\tEdge Case Coverage\n\tExploratory Scenarios (if applicable)\n3.\tCoverage Expectations\no\tEnsure 100% functional coverage of the feature.\no\tInclude:\n\tPositive test cases\n\tNegative test cases\n\tEdge cases\n\tError handling scenarios\n\tUI validation (if applicable)\n\tAPI validation (if applicable)\n4.\tTest Case Format (JIRA-Compatible)\nGenerate test cases in a structured tabular format with the following columns:\no\tTest Case ID\no\tTest Case Title\no\tPreconditions\no\tTest Steps\no\tTest Data\no\tExpected Result\no\tTest Type (Functional / Negative / Edge / UI / API)\no\tPriority (High / Medium / Low)\no\tSeverity (Critical / Major / Minor)\n5.\tWriting Guidelines\no\tUse clear, concise, and professional language.\no\tEnsure steps are actionable and reproducible.\no\tAvoid ambiguity.\no\tMaintain consistency across all test cases.\n6.\tOutput Requirements\no\tOutput must be in clean tabular format (Markdown table).\no\tEnsure proper formatting so it can be easily exported to Excel or JIRA.\no\tDo NOT include explanations—only test cases.\n________________________________________\n🚫 Constraints\n•\tDo not assume functionality not mentioned in PRD or JIRA unless logically necessary.\n•\tDo not generate duplicate test cases.\n•\tEnsure each test case is unique and valuable.\n________________________________________\n⭐ Optional Enhancements (if data available)\n•\tMap test cases to Acceptance Criteria\n•\tAdd Test Level (Unit / Integration / System / UAT)\n•\tSuggest Automation feasibility (Yes/No)\n________________________________________\n✅ Expected Outcome\nA complete, structured, and production-ready set of test cases that can be directly used in JIRA or test management tools.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -608,
+        -256
+      ],
+      "id": "8aaa98c1-6591-4c9c-b5f9-58aeb010ee80",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -96
+      ],
+      "id": "7b2ad714-c50d-4315-98d9-698fdb7ef526",
+      "name": "Groq-Brain",
+      "credentials": {
+        "groqApi": {
+          "id": "qg7WdmCxxukS615v",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1GsT57ocl4HaUCxNhBGVmwvLYh7R24gjVB_RDteltkF4/edit?tab=t.0#heading=h.fpj5kzkp24mo"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        -48
+      ],
+      "id": "dbe1d8b3-5c2a-46cd-8ee3-5e29f6150325",
+      "name": "PRD Google Document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "wwbhuYgN8KFKQe1b",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Issue_Key', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jiraTool",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -48
+      ],
+      "id": "bdc9ac9b-2fbc-423e-bf35-34df0a3b81f3",
+      "name": "Read JIRA",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "ySOlBOhp9mEBrWMY",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1XkimYa_kQsNjPqdt0RuxTsn5LObvgCqIVmgCb3H1rcE",
+          "mode": "list",
+          "cachedResultName": "N8N Testcases Generated",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XkimYa_kQsNjPqdt0RuxTsn5LObvgCqIVmgCb3H1rcE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XkimYa_kQsNjPqdt0RuxTsn5LObvgCqIVmgCb3H1rcE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Test Case ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Test_Case_ID', ``, 'string') }}",
+            "Test Case Title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Test_Case_Title', ``, 'string') }}",
+            "Preconditions": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Preconditions', ``, 'string') }}",
+            "Test Steps": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Test_Steps', ``, 'string') }}",
+            "Test Data": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Test_Data', ``, 'string') }}",
+            "Expected Result": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Expected_Result', ``, 'string') }}",
+            "Test Type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Test_Type', ``, 'string') }}",
+            "Priority": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Priority', ``, 'string') }}",
+            "Severity": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Severity', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Test Case ID"
+          ],
+          "schema": [
+            {
+              "id": "Test Case ID",
+              "displayName": "Test Case ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Test Case Title",
+              "displayName": "Test Case Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Preconditions",
+              "displayName": "Preconditions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Test Steps",
+              "displayName": "Test Steps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Test Data",
+              "displayName": "Test Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Expected Result",
+              "displayName": "Expected Result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Test Type",
+              "displayName": "Test Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Severity",
+              "displayName": "Severity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -176,
+        -112
+      ],
+      "id": "ab5490dc-5cc6-4fb4-878f-cf111cc6627b",
+      "name": "Google Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yeiXMbGAMBNCLYpP",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq-Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PRD Google Document": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Read JIRA": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "05c913ab-711d-4d6a-b135-6a0ee7c494e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "74512137b1074ecc1b3a38a7d393ded210df86a003a5f6bd6cfa1d770fb77cd7"
+  },
+  "id": "FbysjeC7Oj7EomlQ",
+  "tags": []
+}
