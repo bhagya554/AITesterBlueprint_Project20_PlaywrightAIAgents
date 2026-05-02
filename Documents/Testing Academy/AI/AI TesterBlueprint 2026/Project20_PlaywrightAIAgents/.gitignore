@@ -6,3 +6,11 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# MCP Cache
+.playwright-mcp/
+.vscode/mcp.json
+
+# Screenshots/Artifacts
+*.png
+*.jpg
